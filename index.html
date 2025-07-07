@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pre-Order Premium Organic Banganapalli Mangoes — IVC Residents Only</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+      background: #f9f9f9;
+    }
+    h2 {
+      color: #d35400;
+    }
+    .info, .success, .error {
+      margin-top: 15px;
+    }
+    .success { color: green; }
+    .error { color: red; }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .highlight {
+      background: #fff3cd;
+      padding: 12px;
+      border-left: 4px solid #ffc107;
+      margin-top: 20px;
+      border-radius: 6px;
+    }
+    .image-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .image-container img {
+      flex: 1;
+      min-width: 48%;
+      max-width: 48%;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    @media (max-width: 600px) {
+      .image-container img {
+        max-width: 100%;
+        min-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2>🥭 Organic Banganapalli Mango Pre-Order — IVC Residents Only</h2>
+
+  <p>
+    Experience the true taste of nature with our premium <strong>Banganapalli mangoes</strong> — organically grown and naturally ripened in the lush orchards of <strong>Palamaner, Chittoor District</strong>, Andhra Pradesh.
+  </p>
+  <p>
+    These golden beauties, weighing between <strong>600–750g each</strong>, are nurtured using eco-friendly practices and naturally bagged on trees to avoid chemicals. The result? Deliciously clean, safe, and sweet mangoes that melt in your mouth.
+  </p>
+  <p>
+    Please note: 🧺 <strong>Minimum order is 2 kg</strong> due to the large size of fruits and packing constraints. Taste the difference today!
+  </p>
+
+  <div class="highlight">
+    ✅ Freshly harvested Banganapalli mangoes from our farm<br>
+    🌱 Naturally ripened — no chemicals or ripening agents<br>
+    📦 Protected on-tree with natural covers for better quality<br>
+    💰 Price: ₹150 per kg (Minimum 2 kg)<br>
+    🚚 Delivery Date: <strong>12 July 2025</strong><br>
+    🏡 For IVC Residents Only<br><br>
+    🔥 Limited stock! Place your pre-order now.
+  </div>
+
+  <div class="image-container">
+    <img src="https://ggkh-autogenix.github.io/ivc-mangos-flat-feedback-form/WhatsApp%20Image%202025-07-05%20at%2017.45.03.jpeg" alt="Harvested Mangoes in Boxes">
+    <img src="https://ggkh-autogenix.github.io/ivc-mangos-flat-feedback-form/WhatsApp%20Image%202025-07-05%20at%2017.45.52.jpeg" alt="Mangoes Bagged on Tree">
+  </div>
+
+  <form id="orderForm">
+    <label>Block:</label>
+    <input type="text" id="block" required>
+
+    <label>Flat Number:</label>
+    <input type="text" id="flat_number" required>
+
+    <label>Quantity (in Kgs) — Min 2 kg:</label>
+    <input type="number" id="kgs" min="2" required>
+
+    <label>Mobile Number:</label>
+    <input type="text" id="mobile_number" required>
+
+    <button type="submit">Submit Pre-Order</button>
+  </form>
+
+  <div class="info" id="infoMsg"></div>
+  <div class="success" id="successMsg"></div>
+  <div class="error" id="errorMsg"></div>
+
+  <script>
+    const API_BASE = "https://mqslfvseexirbrsxpuws.supabase.co/rest/v1/pre_order_info";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc2xmdnNlZXhpcmJyc3hwdXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3NDI4OTEsImV4cCI6MjA2NjMxODg5MX0.bSPcphsl_YOtv3_z07AjU-3BX6wiueW5_xan5KR2f-U";
+
+    const form = document.getElementById("orderForm");
+    const infoMsg = document.getElementById("infoMsg");
+    const successMsg = document.getElementById("successMsg");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      infoMsg.textContent = '';
+      successMsg.textContent = '';
+      errorMsg.textContent = '';
+
+      const block = document.getElementById("block").value.trim().toUpperCase();
+      const flat = document.getElementById("flat_number").value.trim();
+      const kgs = parseInt(document.getElementById("kgs").value.trim());
+      const mobile = document.getElementById("mobile_number").value.trim();
+
+      if (kgs < 2) {
+        errorMsg.textContent = "❌ Minimum order is 2 kg due to fruit size and packing.";
+        return;
+      }
+
+      const fetchURL = `${API_BASE}?select=flat_number,block,mobile_number,kgs&block=eq.${block}&flat_number=eq.${flat}`;
+      const headers = {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`
+      };
+
+      try {
+        const checkRes = await fetch(fetchURL, { headers });
+        const existing = await checkRes.json();
+
+        if (existing.length > 0) {
+          const existingKgs = existing[0].kgs;
+          const confirmOverride = confirm(`Order already exists for ${existingKgs} kg(s).\nDo you want to override it?`);
+          if (!confirmOverride) {
+            infoMsg.textContent = "No changes made.";
+            return;
+          }
+        }
+
+        // ✅ FIXED: UPSERT with correct Prefer header
+        const upsertRes = await fetch(`${API_BASE}?on_conflict=flat_number,block`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: SUPABASE_KEY,
+            Authorization: `Bearer ${SUPABASE_KEY}`,
+            Prefer: "resolution=merge-duplicates,return=minimal"
+          },
+          body: JSON.stringify({
+            block,
+            flat_number: flat,
+            kgs,
+            mobile_number: mobile
+          })
+        });
+
+        if (upsertRes.ok) {
+          successMsg.textContent = "✅ Order saved successfully!";
+          form.reset();
+        } else {
+          const error = await upsertRes.text();
+          errorMsg.textContent = `❌ Error: ${error}`;
+        }
+
+      } catch (err) {
+        errorMsg.textContent = "❌ Something went wrong: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
