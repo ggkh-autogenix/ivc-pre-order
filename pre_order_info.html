@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pre-Order List</title>
+  <style>
+    body { font-family: Arial; padding: 20px; max-width: 700px; margin: auto; }
+    h2 { margin-bottom: 20px; }
+    .order { border: 1px solid #ccc; padding: 15px; margin-bottom: 10px; border-radius: 8px; }
+    .meta { color: #555; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <h2>Submitted Pre-Orders</h2>
+  <div id="orderContainer">Loading...</div>
+
+  <script>
+    const SUPABASE_URL = "https://mqslfvseexirbrsxpuws.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1xc2xmdnNlZXhpcmJyc3hwdXdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTA3NDI4OTEsImV4cCI6MjA2NjMxODg5MX0.bSPcphsl_YOtv3_z07AjU-3BX6wiueW5_xan5KR2f-U";
+
+    async function fetchOrders() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/pre_order_info?select=flat_number,block,kgs,mobile_number,created_at&order=created_at.desc`, {
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      });
+
+      const orders = await res.json();
+      const container = document.getElementById('orderContainer');
+      container.innerHTML = '';
+
+      if (orders.length === 0) {
+        container.innerHTML = "<p>No pre-orders found.</p>";
+        return;
+      }
+
+      orders.forEach(order => {
+        const item = document.createElement('div');
+        item.className = 'order';
+        item.innerHTML = `
+          <div><strong>Block:</strong> ${order.block} | <strong>Flat:</strong> ${order.flat_number}</div>
+          <div><strong>Kgs:</strong> ${order.kgs ?? '-'} | <strong>Mobile:</strong> ${order.mobile_number}</div>
+          <div class="meta">Submitted on: ${new Date(order.created_at).toLocaleString()}</div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>
